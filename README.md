@@ -31,5 +31,6 @@ Ensure you have **Python 3.11+** installed. If not, install it via:
 
 ```sh
 sudo apt update && sudo apt install python3.11 python3.11-venv python3.11-dev -y
+```
 
 Next, create and activate a virtual environment:
