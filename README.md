@@ -1,4 +1,4 @@
-# Yijia_Sun_PS1: **System Configuration and Setup Guide**
+# Yijia_Sun_PS2: **System Configuration and Setup Guide**
 
 This document provides **detailed setup instructions** for running the **comorbidity network analysis system** on both **cloud** and **local** environments.
 
