@@ -29,7 +29,7 @@ After finishing downloading, open the `Data.zip` file, click the `Data` folder, 
 This dataset is used to analyze the evolution of comorbidity networks over 1997-2014 in research conducted by the GitHub owner.
 
 ## Preprocessing
-Run code in Jupter Notebook or Google Colab to preprocess the raw data.
+Run code in Jupyter Notebook or Google Colab to preprocess the raw data.
 ```python
 !pip install ace_tools
 ```
