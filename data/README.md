@@ -21,14 +21,21 @@ This dataset is sourced from [figshare](https://figshare.com/articles/dataset/Co
 
 After getting into the figshare page, under the title "Comorbidity Networks From Population-Wide Health Data: Aggregated Data of 8.9M Hospital Patients (1997-2014)" there is a `Download(203.1 MB)` button. Click that button, the `Data.zip` file will automatically start downloading (Fig. 1).
 ![The Figshare Page](https://github.com/user-attachments/assets/6c72e983-84fa-47fd-8c75-465acead4beb)
+
 After finishing downloading, open the `Data.zip` file, click the `Data` folder, then enter the `1.Prevalence` folder, in which the `Prevalence_Sex_Age_Year_ICD.csv` file is the dataset used.
+![The Location of Dataset inside Folder](https://github.com/user-attachments/assets/5f6b379f-f6a3-48ed-8ab7-d483638acb9c)
 
+## Purpose
+This dataset is used to analyze the evolution of comorbidity networks over 1997-2014 in research conducted by the GitHub owner.
 
-## Usage
-This dataset can be used for analyzing disease prevalence trends across different demographics over time. It is particularly useful for epidemiological studies and healthcare policy analysis.
+## Useage
+Except for the usage in Purpose, this dataset can also be used to determine disease prevalence trends across different demographics over time. It is particularly useful for epidemiological studies and healthcare policy analysis.
 
 ## License
 This dataset is provided for research and educational purposes.
 
 ## Contact
 For any questions or further details, please reach out to the dataset provider.
+
+## Ciation
+Dervic, Elma (2025). Comorbidity Networks From Population-Wide Health Data: Aggregated Data of 8.9M Hospital Patients (1997-2014). figshare. Dataset. https://doi.org/10.6084/m9.figshare.27102553.v2
