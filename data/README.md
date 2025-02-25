@@ -40,7 +40,7 @@ from sklearn.impute import KNNImputer
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 # Load the dataset
-file_path = "Prevalence_Sex_Age_Year_ICD.csv"  # Change this to the correct path
+file_path = "data/rawDataset/Prevalence_Sex_Age_Year_ICD.csv"  # Change this to the correct path
 df = pd.read_csv(file_path)
 ```
 ### Step 1: Handling Missing Data using KNN Imputation
