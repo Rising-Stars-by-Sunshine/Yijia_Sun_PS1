@@ -1,0 +1,133 @@
+'''
+Model the Problem
+
+Objective:
+Estimate the causal effect of early diabetes screening on diabetes prevalence, where the treatment (mandatory screening) is assigned based on a threshold in a continuous variable (age).
+This study leverages Regression Discontinuity Design (RDD) to analyze whether individuals who receive mandatory diabetes screening at age 45 experience lower Type 2 diabetes prevalence.
+
+Key Concepts:
+ - Running Variable
+   - Age: The continuous variable that determines treatment assignment.
+   - Individuals below 45 are not required to undergo diabetes screening.
+   - Individuals aged 45 and above are mandated to receive screening.
+
+- Cutoff
+  - Age 45: The threshold where treatment (screening) is applied.
+
+- Treatment (Intervention)
+  - Mandatory diabetes screening for individuals aged 45 and above.
+  - The expected outcome is a reduction in undiagnosed Type 2 diabetes cases.
+
+- Outcome Variable
+  - Diabetes Prevalence: Measured by hospital records and medical diagnoses.
+
+- Sharp vs. Fuzzy RD Design
+  - Sharp RDD: In this case, treatment is strictly assigned at the cutoff (every individual aged 45+ must undergo screening).
+  - Fuzzy RDD Alternative: If compliance is imperfect (e.g., some eligible individuals do not get screened, while some ineligible individuals do), a Fuzzy RDD approach would be used.
+
+Example Application:
+- Health Policy Analysis
+  - Understanding the effectiveness of early diabetes screening policies.
+  - Evaluating whether mandatory screening at age 45 reduces long-term diabetes prevalence.
+  - Informing policymakers on potential expansions of preventive screening programs.
+'''
+
+# Install necessary packages (only needed in Google Colab)
+!pip install rdrobust --quiet
+!pip install statsmodels --quiet
+
+# Import required libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import seaborn as sns
+from rdrobust import rdrobust, rdbwselect
+from scipy.stats import norm
+
+# --- Step 1: Generate Synthetic Data ---
+np.random.seed(42)
+n = 10000  # Increased sample size for robustness
+
+# Running variable: Age (ranging from 15 to 99)
+age = np.random.randint(15, 100, size=n)
+
+# Treatment assignment: Screening applies to individuals aged 45+
+D = (age >= 45).astype(int)
+
+# Baseline diabetes prevalence function (age-dependent trend)
+Y_base = 0.05 + 0.003 * age  # Increasing diabetes prevalence with age
+
+# Treatment effect: Positive impact of early screening in reducing diabetes prevalence
+tau = -0.02  # Screening reduces diabetes risk
+Y = Y_base + tau * D + np.random.normal(0, 0.005, size=n)  # Adding small random noise
+
+# Create DataFrame
+df = pd.DataFrame({"age": age, "D": D, "diabetes_prevalence": Y})
+
+df.head()
+
+# --- Step 2: Visualize the Data ---
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x=df["age"], y=df["diabetes_prevalence"], alpha=0.5, label="Observed Diabetes Prevalence")
+
+# Fit separate regressions on both sides of the cutoff
+low = df[df["age"] < 45]
+high = df[df["age"] >= 45]
+
+low_model = sm.OLS(low["diabetes_prevalence"], sm.add_constant(low["age"])).fit()
+high_model = sm.OLS(high["diabetes_prevalence"], sm.add_constant(high["age"])).fit()
+
+# Generate fitted values
+age_grid_low = np.linspace(40, 45, 100)
+age_grid_high = np.linspace(45, 50, 100)
+
+Y_low_pred = low_model.predict(sm.add_constant(age_grid_low))
+Y_high_pred = high_model.predict(sm.add_constant(age_grid_high))
+
+# Plot fitted regression lines
+plt.plot(age_grid_low, Y_low_pred, color="blue", label="Below Cutoff (No Screening)")
+plt.plot(age_grid_high, Y_high_pred, color="red", label="Above Cutoff (Screened)")
+
+# Cutoff line
+plt.axvline(x=45, color="black", linestyle="--", label="Cutoff at Age 45")
+
+# Labels and title
+plt.xlabel("Age")
+plt.ylabel("Diabetes Prevalence")
+plt.title("Regression Discontinuity: Effect of Early Screening on Diabetes Prevalence")
+plt.legend()
+plt.show()
+
+# --- Step 3: Estimate the Causal Effect using Local Linear Regression ---
+df["age_centered"] = df["age"] - 45  # Center age at cutoff
+df["D_age"] = df["D"] * df["age_centered"]  # Interaction term for different slopes
+
+# Regression model
+X_reg = sm.add_constant(df[["D", "age_centered", "D_age"]])
+model = sm.OLS(df["diabetes_prevalence"], X_reg).fit()
+
+print("\n=== Regression Discontinuity Results ===")
+print(model.summary())
+
+# 🔹 Placebo Test: Fake Cutoff at Age 40
+df["D_placebo"] = (df["age"] >= 40).astype(int)
+X_placebo = sm.add_constant(df[["D_placebo", "age_centered", "D_age"]])
+model_placebo = sm.OLS(df["diabetes_prevalence"], X_placebo).fit()
+
+print("\n=== Placebo Test (Cutoff at Age 40) ===")
+print(model_placebo.summary())
+
+# 🔹 McCrary's Density Test for Manipulation of Age Near Cutoff
+def plot_density_test(X, cutoff=45, bins=30):
+    plt.figure(figsize=(8,5))
+    plt.hist(X[X < cutoff], bins=bins, alpha=0.6, label="Below Cutoff")
+    plt.hist(X[X >= cutoff], bins=bins, alpha=0.6, label="Above Cutoff")
+    plt.axvline(cutoff, color='black', linestyle='--', label=f"Cutoff at {cutoff}")
+    plt.xlabel("Age")
+    plt.ylabel("Density")
+    plt.title("McCrary Density Test for Running Variable Manipulation")
+    plt.legend()
+    plt.show()
+
+plot_density_test(df["age"])
